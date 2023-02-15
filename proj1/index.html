@@ -1,7 +1,259 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 1 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <style>
+        body {
+            padding: 100px;
+            width: 1000px;
+            margin: auto;
+            text-align: left;
+            font-weight: 300;
+            font-family: 'Open Sans', sans-serif;
+            color: #121212;
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+    </style>
+    <title>CS 184 Rasterizer</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+    <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+    <h1 align="middle">Project 1: Rasterizer</h1>
+    <h2 align="middle">Anze Liu</h2>
+
+    <br><br>
+
+    <div>
+
+        <h2 align="middle">Overview</h2>
+        <p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
+
+        <h2 align="middle">Section I: Rasterization</h2>
+
+        <h3 align="middle">Part 1: Rasterizing Single-Color Triangles</h3>
+
+        <h3>How to rasterize a triangle:</h3>
+        <p>First, locate the x and y coordinates of the top left corner and bottom right corner of the bounding box for the triangle. The coordinates of the bounding box can be calculated by finding the minimum and maximum of the x and y coordinates of the
+            triangle, respectively. As shown below:</p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task1/bounding_box.png" align="middle" width="1000px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p> Second, iterate through the samples in the bounding box and perform the point-in-triangle test to determine if the sample is inside the triangle, meaning if the line equations of the 3 edges of triangle with the sampled point as input result in
+            greater than or equal to zero. Finally, if the sampled point satisfies the point-in-triangle test, it is rasterized.</p>
+
+        <h3>Explain how the algorithm is no worse than one that checks each sample within the bounding box of the triangle.</h3>
+        <p>The algorithm checks each sample within the bounding box of the triangle. The coordinates of the top left corner and the bottom right corner of the bounding box are found by finding the minimum and maximum of x and y coordinates respectively.
+            After that, 2 for loops are implemented to iterate every sample from the top left corner to the bottom right corner of the bounding box to check if the sample is within the triangle and rasterize the point if it is. The runtime is linear in
+            terms of the size of the bounding box of each triangle in the image.</p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task1/test3.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 1: basic/test3.png</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task1/test4.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 2: basic/test4.png</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/task1/test5.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 3: basic/test5.png</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task1/test6.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 4: basic/test6.png</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br>
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <img src="images/task1/test4_pixel_inspector.png" align="middle" width="400px" />
+                    <figcaption align="middle">Image 5: basic/test4.png with pixel inspector</figcaption>
+                </tr>
+            </table>
+        </div>
+
+
+        <h3 align="middle">Part 2: Antialiasing Triangles by Supersampling</h3>
+
+        <h3>Supersampling algorithm and data structures. Why is supersampling useful? What modifications did you make to the rasterization pipeline in the process? Explain how you used supersampling to antialias your triangles.</h3>
+        <p>To implement supersampling, we need to perform the point-in-triangle test for each of the sample points inside a pixel within the bounding box of the triangle. Every pixel is divided into NxN boxes if the sample rate is N. If the sample point
+            passes the point-in-triangle test, then the color will be stored at the corresponding position in the sample buffer, which has the following structure:</p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task2/task2_explanation.png" align="middle" width="1000px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>Finally, fill_pixel is modified to set all supersamples per pixel into the same given input color for rasterizing lines and points.
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task2/test4_sample_rate1_inspector.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 6: basic/test4.png, sampling rate = 1</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task2/test4_sample_rate9_inspector.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 7: basic/test4.png, sampling rate = 4</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/task2/test4_sample_rate9_inspector.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 8: basic/test4.png, sampling rate = 9</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task2/test4_sample_rate16_inspector.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 9: basic/test4.png, sampling rate = 16</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3 align="middle">Part 3: Transforms</h3>
+
+        <h3>Create an updated version of svg/transforms/robot.svg with cubeman doing something more interesting, like waving or running. Feel free to change his colors or proportions to suit your creativity. Save your svg file as my_robot.svg in your docs/
+            directory and show a png screenshot of your rendered drawing in your write-up. Explain what you were trying to do with cubeman in words.</h3>
+        <p>To create cubeman, the three transformation functions are implemented in the homogeneous coordinates: translate, scale, and rotate.</p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task3/transforms.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 10: transforms/robot.png</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task3/my_robot.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 11: transforms/my_robot.png</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Section II: Sampling</h2>
+
+        <h3 align="middle">Part 4: Barycentric coordinates</h3>
+
+        <h3>Explain barycentric coordinates in your own words and use an image to aid you in your explanation. One idea is to use a svg file that plots a single triangle with one red, one green, and one blue vertex, which should produce a smoothly blended
+            color triangle.</h3>
+        <p>Barycentric coordinates indicate the location of a point inside a triangle based on the relationship from each of the vertices of the triangle to that particular point.</p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task4/test7.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 12: basic/test7.png</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task4/task4_triangle_interpolation.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 13: a single triangle with red, green, and blue vertices</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+        <h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+
+        <h3>Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. Briefly discuss the two different pixel sampling methods, nearest and bilinear.</h3>
+        <p>Pixel sampling is obtaining the texture image pixel color for the screen sampled position given the texture and the coordinates of the sample point. To perform texture mapping, for each rasterized screen sample (x, y), obtain the texture image
+            pixel by performing the following operation:
+        </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task5/task5_matrix.png" align="middle" width="500px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+
+        <h3>Explain level sampling in your own words and describe how you implemented it for texture mapping.</h3>
+
+        <p>Level sampling is computing the mipmap level, obtaining the mipmap of that level, and sampling the texture from the mipmap, depending on the level sampling choice: zero level, nearest level D, or linear interpolation between the sampled texture
+            from the two adjacent levels. </p>
+
+        <h3>You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques.</h3>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task5/new_test6_nearest_sample_rate_1.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 14: texmap/test6.png, nearest sampling at 1 sample per pixel</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task5/new_test6_nearest_sample_rate_16.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 15: texmap/test6.png, nearest sampling at 16 sample per pixel</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/task5/new_test6_bilinear_sample_rate_1.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 16: texmap/test6.png, bilinear sampling at 1 sample per pixel</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task5/new_test6_bilinear_sample_rate_16.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 17: texmap/test6.png, bilinear sampling at 16 sample per pixel</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+
+        <h2 align="middle">Section III: Art Competition</h2>
+        <p>If you are not participating in the optional art competition, don't worry about this section!</p>
+
+        <h3 align="middle">Part 7: Draw something interesting!</h3>
+
+        <a href="https://anzeliu.github.io/cs184-proj-webpage/proj1/index.html">
+            <p align="middle">anzeliu.github.io/cs184-proj-webpage/proj1</p>
+        </a>
+
+</body>
+
 </html>
