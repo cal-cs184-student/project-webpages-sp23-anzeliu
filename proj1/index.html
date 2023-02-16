@@ -45,7 +45,8 @@
 
         <h3>How to rasterize a triangle:</h3>
         <p>First, locate the x and y coordinates of the top left corner and bottom right corner of the bounding box for the triangle. The coordinates of the bounding box can be calculated by finding the minimum and maximum of the x and y coordinates of the
-            triangle, respectively. As shown below:</p>
+            triangle, respectively. As shown below:
+        </p>
 
         <div align="middle">
             <table style="width:100%">
@@ -208,15 +209,6 @@
             </table>
         </div>
 
-        <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
-
-        <h3>Explain level sampling in your own words and describe how you implemented it for texture mapping.</h3>
-
-        <p>Level sampling is computing the mipmap level, obtaining the mipmap of that level, and sampling the texture from the mipmap, depending on the level sampling choice: zero level, nearest level D, or linear interpolation between the sampled texture
-            from the two adjacent levels. </p>
-
-        <h3>You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques.</h3>
-
         <div align="middle">
             <table style="width:100%">
                 <tr>
@@ -243,7 +235,86 @@
             </table>
         </div>
 
+        <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
 
+        <h3>Explain level sampling in your own words and describe how you implemented it for texture mapping.</h3>
+
+        <p>Level sampling is computing the mipmap level, obtaining the mipmap of that level, and sampling the texture from the mipmap, depending on the level sampling choice: zero level, nearest level D, or linear interpolation between the sampled texture
+            from the two adjacent levels. </p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <img src="images/task6/new.png" align="middle" width="200px" />
+                    <figcaption align="middle">Image 18: original image</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task6/L_zero_P_nearest.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 19: new image with L_ZERO and P_NEAREST</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task6/L_zero_P_linear.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 20: new image with L_ZERO and P_LINEAR</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/task6/L_nearest_P_nearest.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 21: new image L_NEAREST and P_NEAREST</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task6/L_nearest_P_linear.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 22: new image L_NEAREST and P_LINEAR</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques.</h3>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/task6/task6_nearest_sampling_Lzero.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 23: nearest-pixel sampling + level zero</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task6/task6_bilinear_sampling_Lzero.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 24: bilinear sampling + level zero</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/task6/task6_nearest_sampling_Lnearest.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 25: nearest-pixel sampling + nearest level</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task6/task6_bilinear_sampling_Lnearest.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 26: bilinear sampling + nearest level</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/task6/task6_nearest_sampling_Lbilinear.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 27: nearest-pixel sampling + bilinear-level interpolation</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/task6/task6_bilinear_sampling_Lbilinear.png" align="middle" width="400px" />
+                        <figcaption align="middle">Image 28: bilinear sampling + bilinear-level interpolation</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
         <h2 align="middle">Section III: Art Competition</h2>
         <p>If you are not participating in the optional art competition, don't worry about this section!</p>
