@@ -38,8 +38,14 @@
 
         <h1 align="middle">Overview</h1>
 
-        <p>In project 1, I implemented a rasterizer with different functionalities: triangle drawing, antialising with supersampling, transforms in homogeneous coordinates, barycentric interpolation, and texture mapping.
-        </p>
+        <p>In project 1, I implemented a rasterizer with different functionalities: triangle drawing, antialising with supersampling, transforms in homogeneous coordinates, barycentric interpolation, and texture mapping. A SVG object calls its draw function
+            to draw all the elements described in an SVG file and the draw function calls a specific rasterizer, for example, rasterize_triangle, rasterize_interpolated_color_triangle, and rasterize_textured_triangle, to achieve the different functionalities.
+            Starting with a point-in-triangle test and sampling at 1 sample per pixel, we are able to rasterize single color triangles. Moving on to using supersampling, which is taking the average of subdivided parts within each pixel, to avoid image
+            antialiasing. With transform matrices in homogeneous coordinates, we are able to manipulate simple geometry to achieve complex shapes in different positions at various angles. Using barycentric coordinates, which describes the relative distance
+            of a point in a triangle from the three triangle vertices, we can draw triangles with varying colors, which concludes the section on rasterization. Next is sampling, specifically pixel sampling and level sampling, on full-resolution texture
+            images. Pixel sampling consists of nearest-pixel sampling and bilinear interpolation, the former obtains the texture color for a sample point from the closest pixel center, whereas the latter computes the weighted average of the 4 closest
+            pixel centers. Finally, we implement level sampling, sampling from different mipmap levels. Mipmap is a sequence of textures, each of which is in a progressively decreasing resolution of the same image. There are three choices of level sampling:
+            level-zero, nearest level, and bilinear level interpolation, which has different compute speed, memory usage, and antialiasing power. We will explore the details of the above implementations and effect on images in this report. </p>
 
         <h1 align="middle">Section I: Rasterization</h1>
 
@@ -306,6 +312,10 @@
             <li>
                 <p>Bilinear sampling computes a weighted average of the four closest pixel centers to the sample point using the lerp (linear interpolation) function.</p>
             </li>
+            <li>
+                <p>Note: width and height scaled (u, v) coordinates passed to mip.get_texel are clamped to be within [0, width-1] and [0, height-1], respectively, in order to ensure that the coordinates are within the bounds of the texture image.
+                </p>
+            </li>
         </ul>
 
         <h3> Now we are able to rasterize the svg files with texture maps after implementing pixel sampling </h3>
@@ -313,7 +323,7 @@
         <div align="middle">
             <table style="width:100%">
                 <tr>
-                    <img src="images/task5/pixel_sampling_test5.png" align="middle" width="400px" />
+                    <img src="images/task5/pixel_sampling_test6.png" align="middle" width="400px" />
                     <figcaption align="middle">Image 14: texmap/test5, nearest sampling 1 sample per pixel</figcaption>
                 </tr>
                 <tr>
@@ -329,11 +339,11 @@
                 <br>
                 <tr>
                     <td>
-                        <img src="images/task5/pixel_sampling_test3.png" align="middle" width="400px" />
+                        <img src="images/task5/pixel_sampling_test4.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 17: texmap/test3, nearest sampling 1 sample per pixel</figcaption>
                     </td>
                     <td>
-                        <img src="images/task5/pixel_sampling_test4.png" align="middle" width="400px" />
+                        <img src="images/task5/pixel_sampling_test5.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 18: texmap/test4, nearest sampling 1 sample per pixel</figcaption>
                     </td>
                 </tr>
@@ -400,8 +410,6 @@
             </table>
         </div>
 
-
-
         <h3>You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques.</h3>
 
         <h3>Tradeoffs between speed </h3>
@@ -420,33 +428,33 @@
             <table style="width:100%">
                 <tr>
                     <td>
-                        <img src="images/task6/task6_nearest_sampling_Lzero.png" align="middle" width="400px" />
+                        <img src="images/task6/level_zero_nearest_sampling.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 23: nearest-pixel sampling + level zero</figcaption>
                     </td>
                     <td>
-                        <img src="images/task6/task6_bilinear_sampling_Lzero.png" align="middle" width="400px" />
+                        <img src="images/task6/level_zero_bilinear_sampling.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 24: bilinear sampling + level zero</figcaption>
                     </td>
                 </tr>
                 <br>
                 <tr>
                     <td>
-                        <img src="images/task6/task6_nearest_sampling_Lnearest.png" align="middle" width="400px" />
+                        <img src="images/task6/level_nearest_nearest_sampling.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 25: nearest-pixel sampling + nearest level</figcaption>
                     </td>
                     <td>
-                        <img src="images/task6/task6_bilinear_sampling_Lnearest.png" align="middle" width="400px" />
+                        <img src="images/task6/level_nearest_bilinear_sampling.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 26: bilinear sampling + nearest level</figcaption>
                     </td>
                 </tr>
                 <br>
                 <tr>
                     <td>
-                        <img src="images/task6/task6_nearest_sampling_Lbilinear.png" align="middle" width="400px" />
+                        <img src="images/task6/level_bilinear_nearest_sampling.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 27: nearest-pixel sampling + bilinear-level interpolation</figcaption>
                     </td>
                     <td>
-                        <img src="images/task6/task6_bilinear_sampling_Lbilinear.png" align="middle" width="400px" />
+                        <img src="images/task6/level_bilinear_bilinear_sampling.png" align="middle" width="400px" />
                         <figcaption align="middle">Image 28: bilinear sampling + bilinear-level interpolation</figcaption>
                     </td>
                 </tr>
@@ -498,9 +506,13 @@
             </table>
         </div>
 
+        <p> I used an image that I took to show the difference between level sampling and pixel sampling. For both nearest-pixel sampling and bilinear sampling at 1 sample per pixel, nearest level sampling removes more aliases than level-zero sampling.</p>
+
+        <br>
         <a href="https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj1/index.html">
-            <p align="middle">Link to Project 1 - Rasterizer Write-up Webpage: cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj1/index.html</p>
+            <p align="middle">Link to Project 1 Rasterizer Webpage: https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj1/index.html</p>
         </a>
+
 
 </body>
 
