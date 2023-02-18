@@ -74,7 +74,8 @@
         <p>Third, perform the point-in-triangle test to determine if the sample is inside the triangle. Passing the point-in-triangle test means that the line equations of the 3 edges of the triangle with the sampled point as input result in greater than
             or equal to zero.</p>
 
-        <p>To accommodate for the different winding order of the triangle vertices, for example clockwise or counter-clockwise, the point-in-triangle test is performed on all both winding order of the triangle vertices, which are illustrated as follows:</p>
+        <p>To accommodate for the different winding order of the triangle vertices, clockwise or counter-clockwise with normals facing opposite different directions, the point-in-triangle test is performed on both winding order of the triangle vertices,
+            which are illustrated as follows:</p>
 
         <div align="middle">
             <table style="width:100%">
@@ -86,7 +87,7 @@
             </table>
         </div>
 
-        <p>If the sample point is inside of one of the above triangles, then the point-in-triangle test is passed.</p>
+        <p>If the sample point is inside of one of the above triangles, then it passes the point-in-triangle test.</p>
 
         <p>Finally, if the sampled point satisfies the point-in-triangle test, it is rasterized.</p>
 
@@ -95,6 +96,8 @@
             After that, 2 for loops are implemented to iterate every sample from the top left corner to the bottom right corner of the bounding box to check if the sample is within the triangle and rasterize the point if it is. The runtime is linear in
             terms of the number of integer points inside the bounding box of each triangle in the image.</p>
 
+        <h3>Results of Triangle Rasterizer</h3>
+        <p>After implementing a single color triangle rasterizer, the following svg files can be rendered:</p>
         <div align="middle">
             <table style="width:100%">
                 <tr>
@@ -129,7 +132,7 @@
                 </tr>
             </table>
         </div>
-        <p> Aliasing has occurred so that the edges of the triangles are uneven; has staircase-like edges.</p>
+        <p>As shown from Image 5 with the inspector focusing on a corner of the green triangle, aliasing has occurred, as a result, the edges of the triangles are uneven; has staircase-like edges. To antialias, we can perform supersampling. </p>
 
         <h2 align="middle">Part 2: Antialiasing Triangles by Supersampling</h2>
 
@@ -149,7 +152,7 @@
 
         <p>Supersampling is useful because it removes anti-aliasing by rasterizing an image to a higher resolution, taking the average of multiple color samples within a pixel, and downsampling to the output resolution of the frame buffer.</p>
 
-        <p> Rasterization pipeline is modified to enable supersampling:</p>
+        <p> The following modifications to the Rasterization pipeline are made to enable supersampling:</p>
         <ul>
             <li>set_framebuffer_target and set_sample_rate are modified to have the sample buffer resize to width*height*sample_rate instead of width*height</li>
             <li>Instead of calling fill_pixel to color the pixel in rasterize_triangle function, the color of each of the sqrt(sample_rate)*sqrt(sample_rate) sample points are stored into a sample buffer. </li>
@@ -221,8 +224,9 @@
         </div>
 
         <p>To create a running cubeman, the translate and rotate functions are used in my_robot.svg. After filling the polygons with color and scaling them to represent legs and arms, the polygons are rotated and translated. The rotation and translation
-            are adjusted little by little so that the cubeman looks like it is running. More specifically, I first identify whether the colored and scaled rectangles should be rotated clockwise or counterclockwise and by how much they should rotate. After
-            setting the rotation, I use translation to move the different body parts to where they belong in a cubeman running pose.</p>
+            are adjusted little by little so that the cubeman looks like it is running. More specifically, I first identify whether the colored and scaled rectangles should be rotated clockwise or counterclockwise and by how much they should rotate. To
+            rotate the rectangles, the rotation matrix above is used to multiply with the vector representing the rectangles. After setting the rotation, I use translation matrix to move the different body parts to where they belong in a cubeman running
+            pose. After adjusting the rotation and translation, the cubeman transitions from Image 10: robot to Image 11: my_robot.</p>
 
         <h2 align="middle">Section II: Sampling</h2>
 
@@ -258,30 +262,32 @@
         <p>Image 13 above is a triangle with one red, one green, and one blue vertex, created by modifying the svg file to indicate the coordinates of triangle vertices and color at each vertex. The color inside the triangle is blended together based on
             the three vertex colors because each pixel color is calculated using the barycentric coordinates and the three vertex colors. </p>
 
-        <h2 align="middle">Part 5: "Pixel sampling" for texture mapping</h2>
+        <h2 align="middle">Part 5: "Pixel Sampling" for Texture Mapping</h2>
 
         <h3>Explain pixel sampling in your own words and describe how you implemented it to perform texture mapping. Briefly discuss the two different pixel sampling methods, nearest and bilinear.</h3>
         <p>Pixel sampling is obtaining the texture image pixel color for the screen sampled position given the texture and the coordinates of the sample point. To perform texture mapping, for each rasterized screen sample (x, y), obtain the texture image
-            pixel by performing the following operation:</p>
+            (u, v) coordaintes by performing the following operation:</p>
+        <p> Given the texture cooradintes at each triangle vertex, (u0, v0), (u1, v1), (u2, v2) and the triangle vertices (x0, y0), (x1, y1), (x2, y2): </p>
 
         <div align="middle">
             <table style="width:100%">
                 <tr>
-                    <img src="images/task5/task5_matrix.png" align="middle" width="500px" />
+                    <img src="images/task5/task5_matrix.png" align="middle" width="600px" />
                 </tr>
             </table>
         </div>
 
-        <p>Call nearest_sampling or bilinear_sampling with Vector2D(u, v) as argument depending on the value of psm.</p>
-        <p>If performing nearest neighbor sampling, round the sample texture coordinate values, multiply the u coordinate value by width, and multiply the v coordinate value by height, which are used to index the mipmap. </p>
+        <p>Depending on the value of the psm variable, nearest_sampling or bilinear_sampling is called with Vector2D(u, v) as the texture coordaintes.</p>
+        <p>If performing nearest neighbor sampling, round the sample texture coordinate values, multiply the u coordinate value by width, and multiply the v coordinate value by height, which are used to index the vector of mipmap, in order to obtain the
+            mipmap with the proper resolution. </p>
         <p>If performing bilinear sampling: </p>
 
         <ul>
             <li>
-                <p>a linear interpolation function is implemented to abstract away the lerp calculations.</p>
+                <p>A linear interpolation function is implemented to abstract away the lerp calculations.</p>
             </li>
             <li>
-                <p>First, locate the coordinates of the 4 closest texture sample points using floor and ceil functions, labeled in the following diagram. The yellow point is the sample point and the four gray points are the 4 nearest pixel centers.</p>
+                <p>Locate the coordinates of the 4 closest texture sample points using floor and ceil functions, labeled in the following diagram. The yellow point is the sample point and the four gray points are the 4 nearest pixel centers.</p>
             </li>
         </ul>
 
@@ -318,7 +324,7 @@
             </li>
         </ul>
 
-        <h3> Now we are able to rasterize the svg files with texture maps after implementing pixel sampling </h3>
+        <h3> The two different pixel sampling methods are now implemented and we are able to rasterize the elemenst in svg files with texture maps: </h3>
 
         <div align="middle">
             <table style="width:100%">
@@ -393,7 +399,7 @@
             be a large difference between nearest sampling and bilinear sampling at boundaries of objects or when there is a sharp/sudden change in pixel color because this is where bilinear sampling’s smoothing effect makes the color/texture transition
             more natural whereas nearest sampling may cause blocks of pixels more visible. </p>
 
-        <h2 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h2>
+        <h2 align="middle">Part 6: "Level sampling" with Mipmaps for Texture Mapping</h2>
 
         <h3>Explain level sampling in your own words and describe how you implemented it for texture mapping.</h3>
 
@@ -410,20 +416,21 @@
             </table>
         </div>
 
-        <h3>You can now adjust your sampling technique by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques.</h3>
+        <h3>Sampling techniques can now be adjusted by selecting pixel sampling, level sampling, or the number of samples per pixel. Describe the tradeoffs between speed, memory usage, and antialiasing power between the three various techniques.</h3>
 
         <h3>Tradeoffs between speed </h3>
-        <p>Level sampling is lower than pixel sampling because two consecutive levels of mipmaps need to be accessed and the texture color at the uv coordinates on the two mipmaps need to be linearly interpolated to obtain the final output color. As the
+        <p>Level sampling is slower than pixel sampling because two consecutive levels of mipmaps need to be accessed and the texture color at the uv coordinates on the two mipmaps need to be linearly interpolated to obtain the final output color. As the
             number of samples per pixel increases, the speed of computation decreases because we iterate through more samples to determine its color value in supersampling and then downsample to the output frame buffer pixel data. </p>
 
         <h3>Tradeoffs between memory usage </h3>
-        <p>Level sampling uses more memory than pixel sampling because more values need to be stored, including the color results from nearest sampling or bilinear sampling and the difference vectors in Texture::get_level. As the number of samples per pixel
-            increases, more memory is used to store the color values of all the samples per pixel in the sample buffer and the size of the sample buffer increases linearly in terms of the sample rate: if sampling 9 samples per pixel instead of 1, the
-            sample buffer size increases by a factor of 9.</p>
+        <p>Level sampling uses more memory than pixel sampling because more values need to be stored. For example, in bilinear level interpolation, the texture color results from nearest sampling or bilinear sampling at two different mipmap levels need to
+            be stored. As the number of samples per pixel increases, more memory is used to store the color values of all the samples per pixel in the sample buffer and the size of the sample buffer increases linearly in terms of the sample rate: if sampling
+            9 samples per pixel instead of 1, the sample buffer size increases by a factor of 9.</p>
 
         <h3>Tradeoffs between antialiasing power </h3>
-        <p>Level sampling achieves fewer aliases and smoother pixel-to-pixel transition at a lower sample rate compared with pixel sampling. As the sample rate increases, the antialiasing power gets greater. </p>
+        <p>Level sampling, specifically nearest-level or bilinear level, achieves fewer aliases and smoother pixel-to-pixel transition at a lower sample rate compared with pixel sampling. As the sample rate increases, the antialiasing power gets greater.</p>
 
+        <p>Comparison between level sampling and pixel sampling with 1 sample per pixel:</p>
         <div align="middle">
             <table style="width:100%">
                 <tr>
@@ -506,8 +513,10 @@
             </table>
         </div>
 
-        <p> I used an image that I took to show the difference between level sampling and pixel sampling. For both nearest-pixel sampling and bilinear sampling at 1 sample per pixel, nearest level sampling removes more aliases than level-zero sampling.</p>
-
+        <p> I used an image that I took to show the difference between level sampling and pixel sampling. For both nearest-pixel sampling and bilinear sampling at 1 sample per pixel, nearest level sampling removes more aliases than level-zero sampling. In
+            image 30, with level-zero and nearest-pixel sampling, aliases are everywhere; the pixels appear blocky and hold distinct texture color. In Image 31, with level-zero and bilinear sampling,there is not much improvement in antialiasing from Image
+            30, as the edges of the tree branches appear to have jaggies. In Image 32, with nearest-level and nearest-pixel sampling, some of the tree branches are antialiased and the pixel colors appear less blocky. In Image 33, with neartest-level and
+            bilinear sampling, the antialiasing power is shown to be the greatest among the 4 level-sampling and pixel sampling combinations. The image looks more blurred and the there is no obvious jaggies effect. </p>
         <br>
         <a href="https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj1/index.html">
             <p align="middle">Link to Project 1 Rasterizer Webpage: https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj1/index.html</p>
