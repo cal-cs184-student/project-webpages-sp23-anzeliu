@@ -1,7 +1,153 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <style>
+        body {
+            padding: 100px;
+            width: 1000px;
+            margin: auto;
+            text-align: left;
+            font-weight: 300;
+            font-family: 'Open Sans', sans-serif;
+            color: #121212;
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+    </style>
+    <title>CS 184 Rasterizer</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+    <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+    <h1 align="middle">Project 2: MeshEdit</h1>
+    <h2 align="middle">Anze Liu</h2>
+
+    <br><br>
+
+    <div>
+
+        <h1 align="middle">Overview</h1>
+
+        <p>In Project 2 MeshEdit, </p>
+
+        <h1 align="middle">Section I: Bezier Curves and Surfaces</h1>
+
+        <h2 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h2>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part1/curve1_a.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 1: bzc/curve1</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part1/curve1_b.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 2: bzc/curve1 step 1</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/part1/curve1_c.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 3: bzc/curve1 step 2</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part1/curve1_d.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 4: bzc/curve1 step 3</figcaption>
+                    </td>
+                </tr>
+        </div>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <img src="images/part1/curve1_e.png" align="middle" width="600px" />
+                    <figcaption align="middle">Image 5: bzc/curve1 bezier curve</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part1/curve3_a.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 6: new curve</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part1/curve3_b.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 7: new curve step 1</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/part1/curve3_c.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 8: new curve step 2</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part1/curve3_d.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 9: new curve step 3</figcaption>
+                    </td>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/part1/curve3_e.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 10: new curve step 4</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part1/curve3_f.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 11: new curve step 5</figcaption>
+                    </td>
+                </tr>
+        </div>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <img src="images/part1/curve3_g.png" align="middle" width="600px" />
+                    <figcaption align="middle">Image 12: bzc/curve1 bezier curve</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <div align="middle">
+            <video width="700" controls>
+				<source src="videos/part1/part1_demo.mov" type="video/mov">
+			</video>
+        </div>
+
+
+        <h2 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau</h2>
+
+        <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+
+        <h2 align="middle">Part 3: Area-weighted vertex normals</h2>
+
+        <h2 align="middle">Part 4: Edge flip</h2>
+
+        <h2 align="middle">Part 5: Edge split </h2>
+
+        <h2 align="middle">Part 6: Loop subdivision for mesh upsampling </h2>
+
+        <br>
+        <a href="https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj1/index.html">
+            <p align="middle">Link to Project 2 MeshEdit Webpage: </p>
+        </a>
+
+
+</body>
+
 </html>
