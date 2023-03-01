@@ -217,41 +217,80 @@
         </ul>
 
         <h3>Show screenshots of dae/teapot.dae comparing teapot shading with and without vertex normals. Use Q to toggle default flat shading and Phong shading.</h3>
-        <p>As shown from the rendered teapot, with flat shading, the edge lines appear sharp, whereas with Phong shading, the shading smoothly transitions from brighter to darker areas. Vertex normal is the vector perpendicular to the surface tangent at
-            a vertex of a triangle. The brightness of a point on the surface of the teapot depends on the direction of the normal vector, which in turn defines the orientation of the vertex with respect to the light. By computing the sum of the area-weighted
-            normals of neighboring triangles, we take in consideration the orientation of the neighboring triangle surface, therefore leading to a smooth transition from one triangle to another. By normalizing the sum of normals, we eliminate the effect
-            of the magnitude of each element in the 3D vector to the resulting vertex normal and to ensure that the vertex normal is a unit vector. In general, the teapot with vertex normals has the brightness smoothly change from one degree to another,
-            whereas in the teapot without vertex normals, neighboring triangles have more distinct brightness. </p>
 
         <div align="middle">
             <table style="width:100%">
                 <tr>
                     <td>
                         <img src="images/part3/teapot_flat.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 16: bez/teapot.bez teapot with flat shading</figcaption>
+                        <figcaption align="middle">Image 16: bez/teapot.dae teapot with flat shading</figcaption>
                     </td>
                     <td>
                         <img src="images/part3/teapot_flat_angle.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 17: bez/teapot.bez teapot with flat shading at an angle</figcaption>
+                        <figcaption align="middle">Image 17: bez/teapot.dae teapot with flat shading at an angle</figcaption>
                     </td>
                 </tr>
                 <br>
                 <tr>
                     <td>
                         <img src="images/part3/teapot_smooth.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 18: bez/teapot.bez teapot with Phong shading</figcaption>
+                        <figcaption align="middle">Image 18: bez/teapot.dae teapot with Phong shading</figcaption>
                     </td>
                     <td>
                         <img src="images/part3/teapot_smooth_angle.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 19: bez/teapot.bez teapot with Phong shading at an angle</figcaption>
+                        <figcaption align="middle">Image 19: bez/teapot.dae teapot with Phong shading at an angle</figcaption>
                     </td>
                 </tr>
             </table>
         </div>
 
+        <p>As shown from the rendered teapot, with flat shading, the edge lines appear sharp, whereas with Phong shading, the shading smoothly transitions from brighter to darker areas. Vertex normal is the vector perpendicular to the surface tangent at
+            a vertex of a triangle. The brightness of a point on the surface of the teapot depends on the direction of the normal vector, which in turn defines the orientation of the vertex with respect to the light. By computing the sum of the area-weighted
+            normals of neighboring triangles, we take in consideration the orientation of the neighboring triangle surface, therefore leading to a smooth transition from one triangle to another. By normalizing the sum of normals, we eliminate the effect
+            of the magnitude of each element in the 3D vector to the resulting vertex normal and to ensure that the vertex normal is a unit vector. In general, the teapot with vertex normals has the brightness smoothly change from one degree to another,
+            whereas in the teapot without vertex normals, neighboring triangles have more distinct brightness. </p>
+
 
         <h2 align="middle">Part 4: Edge flip</h2>
         <h3>Briefly explain how you implemented the edge flip operation and describe any interesting implementation / debugging tricks you have used.</h3>
+
+        <p>To implement the edge flip operation, first draw out all the elements: faces, halfedges, edges and vertices, on a triangle as follows:</p>
+
+        <div align="middle"><img src="images/part4/before_flip_diagram.png" align="middle" width="700px" /></div>
+
+        <p>Based on the labeled elements, initialize variables with the same name as the above labels and set them to the corresponding VertexIter, HalfedgeIter, EdgeIter, and VertexIter by calling halfedge(), next(), vertex(), face(), edge(), and twin()
+            from the proper elements. </p>
+
+        <p> Once all the elements have been set to their proper variables, I drew a diagram similar to the above but with the edge flipped and all elements reassigned to their new positions, shown as follows:</p>
+
+        <div align="middle"><img src="images/part4/after_flip_diagram.png" align="middle" width="700px" /></div>
+
+        <p>Following this diagram with the flipped edge, I reassigned all the elements that require a change.</p>
+
+        <h3>Show screenshots of a mesh before and after some edge flips.</h3>
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <img src="images/part4/teapot_before_flips.png" align="middle" width="500px" />
+                    <figcaption align="middle">Image 16: bez/teapot.dae teapot without edge flips</figcaption>
+                </tr>
+                <br>
+                <tr>
+                    <td>
+                        <img src="images/part4/teapot_after_flips_A.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 18: bez/teapot.dae teapot after a few edge flips</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part4/teapot_after_flips_B.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after more edges flips</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>Write about your eventful debugging journey, if you have experienced one.</h3>
+        <p>When I first compiled my code and tested the edges with the flip F key, I realized that the edge is flipped but some other edges are missing. However, I did not delete any edges. After examining my code carefully, I pointed out that the halfedge
+            element of each of the edges is not reassigned and the twin element of each of the halfedges on the exterior of the two triangles in the diagram is not reassigned either. After adding these two sets of reassignment, the flip functions correctly.</p>
 
         <h2 align="middle">Part 5: Edge split </h2>
 
