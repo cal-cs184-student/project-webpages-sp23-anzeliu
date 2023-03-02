@@ -38,7 +38,16 @@
 
         <h1 align="middle">Overview</h1>
 
-        <p>In Project 2 MeshEdit, </p>
+        <p>In Project 2 MeshEdit, I explored geometric modeling by using the de Casteljau algorithm to build Bezier curves and surfaces, computing the area-weighted vertex normals to enable Phong shading, flipping and splitting edges of triangle meshes represented
+            by half-edge data structure, and implementing loop subdivision as a upsampling method for 3D meshes. Starting with the de Casteljau algorithm, given n control points and a parameter t that defines the a Bezier curve and where it will be evaluated,
+            respectively, we can linearly interpolate every two consecutive control/intermediate points to reach the next level of subdivision. The final single point would be the point on Bezier curve at parameter t. Extending this algorithm to build
+            Bezier surface, given a 2-dimensional vector of control points consisting of rows and columns, we evaluate the final point on Bezier curve for each of the rows of control points at parameter u, followed by evaluating the final point with the
+            newly found rows’ Bezier curve points at parameter v. Concluding the section on Bezier Curves and Surfaces, we now move on to Triangle Meshes and Half-Edge Data Structure. To enable Phong shading so that the brightness of triangle meshes transitions
+            from one degree to another smoothly, we compute the area-weighted vertex normals. Based on the half-edge data structure representation of triangle meshes, we can manipulate the halfedges, vertices, edges, and faces elements to achieve Edge
+            Flip and Edge Split. Finally, I implemented loop subdivision to upsample 3D meshes by computing the new positions for old and new vertices of a given mesh, split all old edges, flip newly created edges from split operation if they connect
+            a new vertex to an old vertex, and update the position member of each vertex using the precomputed new positions. At the end of the project, we are able to enable Phong shading, modify edges, and upsample meshes. Interestingly, multiple loop
+            subdivision on the cube mesh would result in asymmetry due to corner vertices having different vertex degree. This problem is explored in detail later in the project.
+        </p>
 
         <h1 align="middle">Section I: Bezier Curves and Surfaces</h1>
 
@@ -488,14 +497,13 @@
         <p>as shown from the rendered images, the cube becomes asymmetrical after repeated subdivisions. To subdivide the cube symmetrically, we need to preprocess with the following steps.</p>
 
         <h3> Preprocessing </h3>
-        <p> First splitting the edge across each of the 6 square faces of the cube, as follows:</p>
+        <p> First splitting the edge across each of the 6 square sides of the cube, as follows:</p>
 
         <div align="middle">
             <img src="images/part6/preprocess/split_proprocess.png" align="middle" width="400px" />
         </div>
 
-        <p>Then performing the loop subdivision to upsample would retain the shape of a cube without it becoming asymmetrical after repeated subdivisions, as shown below:</p>
-
+        <p>Then performing the loop subdivision to upsample would better retain the shape of a cube without it becoming asymmetrical after repeated subdivisions.</p>
         <div align="middle">
             <table style="width:100%">
                 <p>cube - level-1 subdivision, level-2 subdivision, and level-3 subdivision</p>
@@ -532,6 +540,23 @@
 
         <h3>Document these effects and explain why they occur. Also explain how your pre-processing helps alleviate the effects.</h3>
 
+        <p>The asymmetrical effect from loop subdivision is due to the different vertex degree of the corner vertices. The cube has diagonal edges on each of its 6 square sides. As shown from teh image below, when viewing the cube from one particular perspective,
+            some diagonal edges connects top left vertex to the bottom right vertex of the square face, whereas other diagonal edges connects top right vertex to the bottom left vertex. As a result, the corner vertices have different degrees: 3, 4, 5,
+            or 6. With different vertex degree, the new positions of the corner vertices would have slightly different weighing scheme.
+        </p>
+
+        <div align="middle">
+            <img src="images/part6/degree.png" align="middle" width="1000px" />
+        </div>
+
+        <p>Assuming the same corner vertex, thus same vposition and old_neighbor_position_sum, the new position if vertex has degree 6 would be smaller than the new position if the vertex has degree 4. This results in the vertex with degree 6 being more
+            rounded off, closer to the origin, than the vertex with degree 4. Consequently, with corner vertices having different degrees, the amounts of position change from their original position to new position are slightly different for every loop
+            subdivision. Eventually the cube appears asymmetrical with multiple loop subdivisions.
+        </p>
+
+        <p>To resolve this problem, we can proprocess the mesh by splitting the edges that goes across diagonally on each of the 6 faces of the cube. This would that all the 8 corner vertices of the cube have the same vertex degree of 6, thus the amount
+            of change from their original position to the new position would be the same. As the corner vertices get updated the same amount, the cube after multiple loop subdivisions would still be symmetrical.
+        </p>
 
         <br>
         <a href="https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj2/index.html">
