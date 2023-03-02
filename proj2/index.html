@@ -266,6 +266,7 @@
         <div align="middle"><img src="images/part4/after_flip_diagram.png" align="middle" width="700px" /></div>
 
         <p>Following this diagram with the flipped edge, I reassigned all the elements that require a change.</p>
+        <p>In addition, before initializing all the variables with the same name as the labels, e0 is checked for whether it is on the boundary or not. If it is a boundary edge, then e0 is immediately returned.</p>
 
         <h3>Show screenshots of a mesh before and after some edge flips.</h3>
         <div align="middle">
@@ -282,7 +283,7 @@
                     </td>
                     <td>
                         <img src="images/part4/teapot_after_flips_B.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after more edges flips</figcaption>
+                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after more edge flips</figcaption>
                     </td>
                 </tr>
             </table>
@@ -293,11 +294,247 @@
             element of each of the edges is not reassigned and the twin element of each of the halfedges on the exterior of the two triangles in the diagram is not reassigned either. After adding these two sets of reassignment, the flip functions correctly.</p>
 
         <h2 align="middle">Part 5: Edge split </h2>
+        <h3>Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used.</h3>
+        <p>To implement the edge split operation, I first draw out a diagram consisting of a triangle and all the relevant faces, halfedges, edges and vertices, same as the diagram in Part 4 - Edge flip:</p>
+
+        <div align="middle"><img src="images/part5/before_split_diagram.png" align="middle" width="700px" /></div>
+
+        <p>Base on this diagram, I initialize variables with the same name as the above labels and set them to the corresponding VertexIter, HalfedgeIter, EdgeIter, and VertexIter by calling halfedge(), next(), vertex(), face(), edge(), and twin() from the
+            proper elements. </p>
+
+        <p>Once all the elements have been set to their proper variables, I drew a diagram to show what the triangles would look like after the slip operation, with modified and newly added halfedges, vertices, edges, and faces, shown as follows:</p>
+        <div align="middle"><img src="images/part5/after_split_diagram.png" align="middle" width="700px" /></div>
+
+        <div align="left"><img src="images/part5/changes.png" align="middle" width="920px" /></div>
+
+        <p>Continuing to follow the diagram, I reassigned elements for all halfedges, vertices, faces, edges, as well as the twins labeled t1, t2, t3, t4, which are halfedges on the exterior of triangles.</p>
+
+        <p>In addition, similar to part 4 - edge flip, before initializing all the variables with the same name as the labels, e0 is checked for whether it is on the boundary or not. If it is a boundary edge, then VertexIter() is immediately returned. </p>
+
+        <p>Finally, vertex m is returned if e0 is not a boundary edge and all the reassignments are complete. </p>
+
+        <h3>Show screenshots of a mesh before and after some edge splits.</h3>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part5/teapot_original.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 18: bez/teapot.dae teapot before edge splits</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part5/teapot_after_split.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after some edge splits</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>Show screenshots of a mesh before and after a combination of both edge splits and edge flips.</h3>
+
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part5/teapot_original.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 18: bez/teapot.dae teapot before edge splits</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part5/teapot_after_split_flip.png" align="middle" width="500px" />
+                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after some edge splits and flips</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>Write about your eventful debugging journey, if you have experienced one.</h3>
+
+        <p> I did not have anything to debug once I completed all the steps outlined above; the split operation works as expected. </p>
+
 
         <h2 align="middle">Part 6: Loop subdivision for mesh upsampling </h2>
 
+        <h3>Briefly explain how you implemented the loop subdivision and describe any interesting implementation / debugging tricks you have used.</h3>
+
+        <p>Loop subdivision is a mesh upsampling method that first subdivides a triangle into four smaller triangles followed by updating the positions of the vertices with a weighing scheme. </p>
+        <ol>
+            <li>Compute the new positions for all the old vertices in the input mesh</li>
+            <div align="middle"><img src="images/part6/step1.png" align="middle" width="980px" /></div>
+            <li>Compute the position for new vertices, which are at the midpoint of every original edge</li>
+            <div align="middle"><img src="images/part6/step2.png" align="middle" width="980px" /></div>
+            <li>Split every old edge in the mesh by iterating over the edges of the original mesh</li>
+            <div align="middle"><img src="images/part6/step3.png" align="middle" width="980px" /></div>
+            <li>Flip any newly added edges that connects a new vertex with an old vertex</li>
+            <div align="middle"><img src="images/part6/step4.png" align="middle" width="980px" /></div>
+            <li>Copy the computed new vertex position into the final Vertex::position</li>
+            <div align="middle"><img src="images/part6/step5.png" align="middle" width="980px" /></div>
+        </ol>
+
+        <p>In summary, loop subdivision is implemented by calculating and storing the new positions for old and new vertices, split every old edges, flip newly created edges if it has both a new and an old vertex, and update the position member of every
+            vertex with new position.</p>
+
+        <h3>Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges?</h3>
+        <p>After each loop subdivision, sharp corners and edges are more rounded as those corner edges get splitted and repositioned with the weighing scheme. For example, as we perform loop subdivision repeatedly on the torus, the hexagon shape becomes
+            circular. Similarly, as we perform loop subdivision repeatedly on the icosahedron, it becomes more like a sphere, losing its original sharp corners. This effect can be reduced by pre-splitting the edges that are not at sharp corners.</p>
+
+        <p>icosahedron - original, level-1 subdivision, level-2 subdivision, and level-3 subdivision</p>
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part6/icosahedron/0.png" align="middle" width="250px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/icosahedron/1.png" align="middle" width="250px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/icosahedron/2.png" align="middle" width="250px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/icosahedron/3.png" align="middle" width="250px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>torus - original, level-1 subdivision, level-2 subdivision, and level-3 subdivision</p>
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part6/torus/0.png" align="middle" width="250px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/torus/1.png" align="middle" width="250px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/torus/2.png" align="middle" width="250px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/torus/3.png" align="middle" width="250px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>bean - original, level-1 subdivision, level-2 subdivision</p>
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part6/bean/0.png" align="middle" width="300px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/bean/1.png" align="middle" width="300px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/bean/2.png" align="middle" width="300px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>cow - original, level-1 subdivision, level-2 subdivision</p>
+        <div align="middle">
+            <table style="width:100%">
+                <tr>
+                    <td>
+                        <img src="images/part6/cow/0.png" align="middle" width="300px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/cow/1.png" align="middle" width="300px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/cow/2.png" align="middle" width="300px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>Load dae/cube.dae. Perform several iterations of loop subdivision on the cube. Notice that the cube becomes slightly asymmetric after repeated subdivisions. Can you pre-process the cube with edge flips and splits so that the cube subdivides symmetrically?</h3>
+        <div align="middle">
+            <table style="width:100%">
+                <p>cube - original, level-1 subdivision, level-2 subdivision</p>
+                <tr>
+                    <td>
+                        <img src="images/part6/cube/0.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/cube/1.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/cube/2.png" align="middle" width="320px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div align="middle">
+            <table style="width:100%">
+                <p>cube - level-3 subdivision, level-4 subdivision, and level-5 subdivision</p>
+                <tr>
+                    <td>
+                        <img src="images/part6/cube/3.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/cube/4.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/cube/5.png" align="middle" width="320px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>as shown from the rendered images, the cube becomes asymmetrical after repeated subdivisions. To subdivide the cube symmetrically, we need to preprocess with the following steps.</p>
+
+        <h3> Preprocessing </h3>
+        <p> First splitting the edge across each of the 6 square faces of the cube, as follows:</p>
+
+        <div align="middle">
+            <img src="images/part6/preprocess/split_proprocess.png" align="middle" width="400px" />
+        </div>
+
+        <p>Then performing the loop subdivision to upsample would retain the shape of a cube without it becoming asymmetrical after repeated subdivisions, as shown below:</p>
+
+        <div align="middle">
+            <table style="width:100%">
+                <p>cube - level-1 subdivision, level-2 subdivision, and level-3 subdivision</p>
+                <tr>
+                    <td>
+                        <img src="images/part6/preprocess/level1.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/preprocess/level2.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/preprocess/level3.png" align="middle" width="320px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div align="middle">
+            <table style="width:100%">
+                <p>cube - level-3 subdivision, level-4 subdivision, and level-5 subdivision</p>
+                <tr>
+                    <td>
+                        <img src="images/part6/preprocess/level4.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/preprocess/level5.png" align="middle" width="320px" />
+                    </td>
+                    <td>
+                        <img src="images/part6/preprocess/level6.png" align="middle" width="320px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+        <h3>Document these effects and explain why they occur. Also explain how your pre-processing helps alleviate the effects.</h3>
+
+
         <br>
-        <a href="https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj1/index.html">
+        <a href="https://cal-cs184-student.github.io/project-webpages-sp23-anzeliu/proj2/index.html">
             <p align="middle">Link to Project 2 MeshEdit Webpage: </p>
         </a>
 
