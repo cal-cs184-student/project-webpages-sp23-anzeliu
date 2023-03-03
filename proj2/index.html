@@ -282,17 +282,17 @@
             <table style="width:100%">
                 <tr>
                     <img src="images/part4/teapot_before_flips.png" align="middle" width="500px" />
-                    <figcaption align="middle">Image 16: bez/teapot.dae teapot without edge flips</figcaption>
+                    <figcaption align="middle">Image 20: bez/teapot.dae teapot without edge flips</figcaption>
                 </tr>
                 <br>
                 <tr>
                     <td>
                         <img src="images/part4/teapot_after_flips_A.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 18: bez/teapot.dae teapot after a few edge flips</figcaption>
+                        <figcaption align="middle">Image 21: bez/teapot.dae teapot after a few edge flips</figcaption>
                     </td>
                     <td>
                         <img src="images/part4/teapot_after_flips_B.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after more edge flips</figcaption>
+                        <figcaption align="middle">Image 22: bez/teapot.dae teapot after more edge flips</figcaption>
                     </td>
                 </tr>
             </table>
@@ -329,11 +329,11 @@
                 <tr>
                     <td>
                         <img src="images/part5/teapot_original.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 18: bez/teapot.dae teapot before edge splits</figcaption>
+                        <figcaption align="middle">Image 23: bez/teapot.dae teapot before edge splits</figcaption>
                     </td>
                     <td>
                         <img src="images/part5/teapot_after_split.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after some edge splits</figcaption>
+                        <figcaption align="middle">Image 24: bez/teapot.dae teapot after some edge splits</figcaption>
                     </td>
                 </tr>
             </table>
@@ -346,11 +346,11 @@
                 <tr>
                     <td>
                         <img src="images/part5/teapot_original.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 18: bez/teapot.dae teapot before edge splits</figcaption>
+                        <figcaption align="middle">Image 25: bez/teapot.dae teapot before edge splits</figcaption>
                     </td>
                     <td>
                         <img src="images/part5/teapot_after_split_flip.png" align="middle" width="500px" />
-                        <figcaption align="middle">Image 19: bez/teapot.dae teapot after some edge splits and flips</figcaption>
+                        <figcaption align="middle">Image 26: bez/teapot.dae teapot after some edge splits and flips</figcaption>
                     </td>
                 </tr>
             </table>
@@ -384,7 +384,8 @@
 
         <h3>Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges?</h3>
         <p>After each loop subdivision, sharp corners and edges are more rounded as those corner edges get splitted and repositioned with the weighing scheme. For example, as we perform loop subdivision repeatedly on the torus, the hexagon shape becomes
-            circular. Similarly, as we perform loop subdivision repeatedly on the icosahedron, it becomes more like a sphere, losing its original sharp corners. This effect can be reduced by pre-splitting the edges that are not at sharp corners.</p>
+            circular. Similarly, as we perform loop subdivision repeatedly on the icosahedron, it becomes more like a sphere, losing its original sharp corners. This effect can be reduced by pre-splitting the edges so that the vertex degree of each of
+            the corner vertices is the same.</p>
 
         <p>icosahedron - original, level-1 subdivision, level-2 subdivision, and level-3 subdivision</p>
         <div align="middle">
@@ -494,7 +495,8 @@
             </table>
         </div>
 
-        <p>as shown from the rendered images, the cube becomes asymmetrical after repeated subdivisions. To subdivide the cube symmetrically, we need to preprocess with the following steps.</p>
+        <p>As shown from the rendered images, the cube becomes asymmetrical after repeated subdivisions. From the current camera perspective, the bottom left corner and the top right corner of the cube seem to have been extended further out than the top
+            left corner and bottom right corner. To subdivide the cube symmetrically, we need to preprocess with the following steps.</p>
 
         <h3> Preprocessing </h3>
         <p> First splitting the edge across each of the 6 square sides of the cube, as follows:</p>
@@ -555,7 +557,9 @@
         </p>
 
         <p>To resolve this problem, we can proprocess the mesh by splitting the edges that goes across diagonally on each of the 6 faces of the cube. This would that all the 8 corner vertices of the cube have the same vertex degree of 6, thus the amount
-            of change from their original position to the new position would be the same. As the corner vertices get updated the same amount, the cube after multiple loop subdivisions would still be symmetrical.
+            of change from their original position to the new position would be the same. As the corner vertices get updated the same amount, the cube after multiple loop subdivisions would still be symmetrical. Overall, the preprocessing that prevent
+            asymmetry from loop subdivisions is splitting edges such that the corner vertices that defines the general shape of the object have the same number of vertex degree because the vertex degree determines to what extent a vertex is moved from
+            their original position to its new position.
         </p>
 
         <br>
