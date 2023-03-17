@@ -70,7 +70,8 @@
         <h2 align="middle">Overview</h2>
         <p>
             In project 3-1 Path Tracer, I implemented a physically-based renderer using a path tracing algorithm which starts with camera ray generation, ray-scene intersection, Bounding Volume Hierarchy acceleration structure, physically based direct and indirect
-            lighting, and adaptive sampling.
+            lighting, and adaptive sampling. By modifying various parameters for rendering, for example, the number of camera rays per pixel, number of samples per area light, and maximum ray depth, we can achieve different levels of denoising on the
+            rendered images.
         </p>
         <br>
 
@@ -129,7 +130,7 @@ Show images with normal shading for a few small .dae files. -->
                     </td>
                     <td>
                         <img src="images/part1/CBempty.png" align="middle" width="400px" />
-                        <figcaption>example2.dae</figcaption>
+                        <figcaption>CBempty.dae</figcaption>
                     </td>
                 </tr>
                 <tr align="center">
@@ -156,7 +157,23 @@ Compare rendering times on a few scenes with moderately complex geometries with 
             Walk through your BVH construction algorithm. Explain the heuristic you chose for picking the splitting point.
         </h3>
         <p>
-            YOUR RESPONSE GOES HERE
+            To construct BVH, first construct the bounding box of a list of primitives.Next, initialize a BVHNode with the bounding box. Sort the list of primitives based on the centroid of their bounding box along the x, y, or z axis. Specifically, while iterating
+            through the list of primitives, in addition to building and expanding the bounding box, declare another bounding box instance, centroid_hull, which would be the convex hull of the centroids of the primitive bounding box. Call centroid_hull.expand(bb.centroid()),
+            where bb is the bounding box of a primitive, in the iteration loop. The extent of the centroid_hull is used to determine along which axis the centroids of primitive bounding boxes are compared, which in turn determines the sorting of the list
+            of primitives at that BVHNode. If the x value of the centroid_hull.extent is greater than the y and z values, then the x values of the centroids are compared and the primitives are sorted based on their bounding box’s centroid along the x
+            axis, in ascending order. Similarly, if the y value of the centroid_hull.extent is greater than the x and z values, then the primitives are sorted based on their bounding box’s centroid along the y axis, in ascending order. Similar case for
+            sorting along the z axis. Once sorting completes, the start iterator now points to the beginning of the sorted list of primitives and the end iterator points to the end of the sorted list.
+        </p>
+        <p>
+            Next, determine whether the node is an interior node or a leaf node based on the number of primitives: if there are no more than max_leaf_size primitives, the newly created node is a leaf node and update its start and end to the beginning of the sorted
+            list and the end of the sorted list respectively. Otherwise, the node is an interior node, for which we find the middle point in the list of primitives and set it as the bound. Finally, recursively call construct_bvh for node->l and node->r,
+            one for primitives from start to bound and another for primitives from bound to end. The half of the primitives with bbox centroid smaller than the median primitive’s bbox centroid along a specific axis are in node->l, and the other half are
+            in node->r. The node is returned.
+        </p>
+        <p>Heuristic chosen for picking the splitting point is the median of the bounding box centroids along axis x, y, or z depending on the extent of the convex hull of the centroids of the primitive bounding box. If the extent of the convex hull is longer
+            along the x axis, then the x values of the bbox centroid coordinates are used to compare and sort the list of primitives. Half of the primitives with bbox centroid x value smaller than that median x value are grouped to the left node and the
+            other half with bbox centroid x value greater than the median x value are grouped to the right node. This helps to construct the BVH efficiently as there are always equal numbers of primitives splitted into left and right. The memory is efficiently
+            used; the split occurs based on the longest axis of the convex hull extent, the primitives in each node are closer together coordinate-wise, thus locality is exploited.
         </p>
 
         <h3>
@@ -198,6 +215,11 @@ Compare rendering times on a few scenes with moderately complex geometries with 
         <div align="middle">
             <img src="images/part2/render_time.png" align="middle" width="950px" />
         </div>
+        <p>
+            Render time increases for both with and without BVH acceleration as the number of primitives increases. The render time with BVH acceleration is less than 1% of the render time without BVH acceleration. The splitting heuristics is the median centroid
+            of the primitive bounding box. This helps to construct the BVH efficiently as there are always equal numbers of primitives splitted into left and right. The memory is efficiently used; the split occurs based on the longest axis of the convex
+            hull extent, the primitives in each node are closer together coordinate-wise, thus locality is exploited.
+        </p>
         <br>
 
         <h2 align="middle">Part 3: Direct Illumination (20 Points)</h2>
@@ -210,12 +232,34 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
             Walk through both implementations of the direct lighting function.
         </h3>
         <p>
-            YOUR RESPONSE GOES HERE
+            BRDF stands for bidirectional reflectance distribution function, which represents the ratio of light reflected into an outgoing direction from a surface to the light from incoming direction, which then determines the brightness of the surface. Note that
+            by convention, the incoming direction vector points away from the surface. Lambertian BRDF is a model of diffuse reflectance and is invariant to the viewing direction. Lambertian BRDF is equal to reflectance divided by pi.
         </p>
 
+        <p>
+            Direct lighting includes both the zero bounce illumination and the one bounce illumination. Zero bounce illumination is the light from the light source that directly reaches the camera without intersecting with any objects in the scene. Zero bounce radiance
+            is obtained by the emissive spectrum of the surface material. One bounce illumination involves casting a camera ray through a pixel into the scene and determining the color of the pixel if the ray intersects with some primitives. Once bounce
+            radiance can be implemented with two different sampling methods: uniform hemisphere sampling and importance sampling lights.
+        </p>
+        <h3>
+            Uniform Hemisphere Sampling
+        </h3>
+        <div align="middle">
+            <img src="images/part3/hemisphere.png" align="middle" width="950px" />
+        </div>
+        <h3>
+            Importance Sampling Lights
+        </h3>
+        <div align="middle">
+            <img src="images/part3/importance.png" align="middle" width="950px" />
+        </div>
+        <p>Finally in one_bounce_radiance, call estimate_direct_lighting_hemisphere or estimate_direct_lighting_importance depending on direct_hemisphere_sample.
+        </p>
+        <br>
         <h3>
             Show some images rendered with both implementations of the direct lighting function.
         </h3>
+
         <!-- Example of including multiple figures -->
         <div align="middle">
             <table style="width:100%">
@@ -285,7 +329,8 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
             </table>
         </div>
         <p>
-            YOUR EXPLANATION GOES HERE
+            For the scene with one area light and two spheres, as the number of light rays increases, the noise in soft shadows decreases. If we only take a few light samples of the area light, the rendering engine could not pick up enough lighting thus could not
+            compute enough radiance to determine the specific brightness of the object surface, causing a grainy effect in the rendered image.
         </p>
         <br>
 
@@ -293,7 +338,8 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
             Compare the results between uniform hemisphere sampling and lighting sampling in a one-paragraph analysis.
         </h3>
         <p>
-            YOUR RESPONSE GOES HERE
+            Uniform hemisphere sampling produces more noisy renders than lighting sampling. Light sampling method samples each light in the scene directly with different pdfs instead of uniformly sampling a direction in a hemisphere. As shown from the rendered scenes
+            with different light rays, lighting sampling is able to obtain a low noise level even with 1 camera ray sample per pixel.
         </p>
         <br>
 
@@ -310,8 +356,14 @@ You will probably want to use the instructional machines for the above renders i
             Walk through your implementation of the indirect lighting function.
         </h3>
         <p>
-            YOUR RESPONSE GOES HERE
+            Indirect lighting involves radiance with more than one bounce. As a camera ray enters a scene, we trace multiple bounce paths that the ray goes through. To determine where the next ray-primitive intersection is, we find out where the light comes from.
         </p>
+        <p>
+            In PathTracer::est_radiance_global_illumination, return zero_bounce_radiance(r, isect) + at_least_one_bounce_radiance(r, isect) as the output.
+        </p>
+        <div align="middle">
+            <img src="images/part4/indirect.png" align="middle" width="950px" />
+        </div>
         <br>
 
         <h3>
@@ -354,7 +406,9 @@ You will probably want to use the instructional machines for the above renders i
         </div>
         <br>
         <p>
-            YOUR EXPLANATION GOES HERE
+            Direct illumination includes the zero bounce illumination and one bounce illumination, whereas the indirect illumination has more than one bounce. In the rendered view with only direct illumination, the area light at the ceiling in the scene is visible,
+            as well as the shadows in the room, on and around the bunny. In comparison, in the rendered view with only indirect illumination, the area light is no longer visible, the reflection of the red and blue wall on the floor and the bunny is visible
+            because there are hints of red and blue on the floor and bunny.
         </p>
         <br>
 
@@ -394,7 +448,8 @@ You will probably want to use the instructional machines for the above renders i
         </div>
         <br>
         <p>
-            YOUR EXPLANATION GOES HERE
+            Max_ray_depth = 0 refers to zero bounce illumination. Max_ray_depth = 1 refers to one bounce illumination. As the value of max_ray_depth increases, the shading and lighting becomes more realistics. For example, we can see the results of light bounces
+            between the red wall, the floor, and bunny, the light bounces between the blue wall, the floor, and bunny.
         </p>
         <br>
 
@@ -480,12 +535,12 @@ Pick one scene and render it with at least 2048 samples per pixel. Show a good s
             <table style="width:100%">
                 <tr align="center">
                     <td>
-                        <img src="images/part5/CBspheres_lambertian_adap.png" align="middle" width="400px" />
-                        <figcaption>RendeIred image (CBspheres_lambertian.dae)</figcaption>
+                        <img src="images/part5/banana_adap.png" align="middle" width="400px" />
+                        <figcaption>RendeIred image (banana.dae)</figcaption>
                     </td>
                     <td>
-                        <img src="images/part5/CBspheres_lambertian_adap_rate.png" align="middle" width="400px" />
-                        <figcaption>Sample rate image (CBspheres_lambertian.dae)</figcaption>
+                        <img src="images/part5/banana_adap_rate.png" align="middle" width="400px" />
+                        <figcaption>Sample rate image (banana.dae)</figcaption>
                     </td>
                 </tr>
                 <tr align="center">
@@ -500,6 +555,10 @@ Pick one scene and render it with at least 2048 samples per pixel. Show a good s
                 </tr>
             </table>
         </div>
+        <p>
+            As shown from the sampling rate images above, the sampling rates are different across different regions and pixels of the scene. For example, in areas of shadows, the sampling rate is high, whereas in areas of almost uniform colors, the sampling rate
+            is low.
+        </p>
         <br>
 
 
