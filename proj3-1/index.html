@@ -70,8 +70,12 @@
         <h2 align="middle">Overview</h2>
         <p>
             In project 3-1 Path Tracer, I implemented a physically-based renderer using a path tracing algorithm which starts with camera ray generation, ray-scene intersection, Bounding Volume Hierarchy acceleration structure, physically based direct and indirect
-            lighting, and adaptive sampling. By modifying various parameters for rendering, for example, the number of camera rays per pixel, number of samples per area light, and maximum ray depth, we can achieve different levels of denoising on the
-            rendered images.
+            lighting, and adaptive sampling. First, I generated num_samples camera rays, traced them through the scene, and computed the average of the returned radiance. Second, I implemented the BVH acceleration structure to accelerate the manipulation
+            and intersection test between a ray and the primitives held by a BVH node. Ray-bounding box intersection is also implemented using the methods of ray-plane intersection for axis-aligned plane and ray intersection with axis-aligned box. Next,
+            I generated direct illumination with zero bounce and one bounce radiance, followed by generating indirect illumination with multiple bounces: light from the light source intersects with multiple surfaces in the scene before reaching the camera.
+            Finally, I implemented adaptive sampling to reduce the number of samples for pixels that converge faster with low sample rate. By modifying various parameters for rendering, for example, the number of camera rays per pixel, number of samples
+            per area light, and maximum ray depth, we can achieve different levels of denoising on the rendered images. The effect of each of the methods introduced above on the rendered scenes are analyzed in this write-up.
+
         </p>
         <br>
 
@@ -86,9 +90,9 @@ Show images with normal shading for a few small .dae files. -->
         <p> Ray generation
         </p>
         <p>
-            Randomly sample positions within a pixel at image coordinate (x, y). For each sample, compute the coordinate in camera space, which is used to determine the direction of a ray in camera space. Transform the ray to be in world space using camera-to-world
-            rotation matrix and the camera position in world space. Call the PathTracer function est_radiance_global_illumination on each ray and take the average of all the resulting radiances, which is a Monte Carlo approximation of the integral of
-            radiance over the pixel. Finally, update the pixel at (x, y) of the sample buffer with the computed average.
+            Randomly sample positions within a pixel at image coordinate (x, y). For each sample, compute the coordinate in camera space, using the coordinates of the axis-aligned rectangular virtual camera sensor. Transform the ray to be in world space using camera-to-world
+            rotation matrix and the camera position in world space. Set the ray’s min_t to nClip and max_t to fClip. Call the PathTracer function est_radiance_global_illumination on each ray and take the average of all the resulting radiances, which is
+            a Monte Carlo approximation of the integral of radiance over the pixel. Finally, update the pixel at (x, y) of the sample buffer with the computed average.
         </p>
         <p>Primitive Intersection</p>
         <p>
@@ -338,8 +342,8 @@ Compare the results between uniform hemisphere sampling and lighting sampling in
             Compare the results between uniform hemisphere sampling and lighting sampling in a one-paragraph analysis.
         </h3>
         <p>
-            Uniform hemisphere sampling produces more noisy renders than lighting sampling. Light sampling method samples each light in the scene directly with different pdfs instead of uniformly sampling a direction in a hemisphere. As shown from the rendered scenes
-            with different light rays, lighting sampling is able to obtain a low noise level even with 1 camera ray sample per pixel.
+            Uniform hemisphere sampling produces more noisy renders than lighting sampling. Light sampling method samples each light in the scene directly with different pdfs instead of uniformly sampling a direction in a hemisphere. With light sampling, the pixels
+            converge faster than with uniform hemisphere sampling. As shown from the rendered scenes with different light rays, lighting sampling is able to obtain a low noise level even with 1 camera ray sample per pixel.
         </p>
         <br>
 
@@ -449,7 +453,8 @@ You will probably want to use the instructional machines for the above renders i
         <br>
         <p>
             Max_ray_depth = 0 refers to zero bounce illumination. Max_ray_depth = 1 refers to one bounce illumination. As the value of max_ray_depth increases, the shading and lighting becomes more realistics. For example, we can see the results of light bounces
-            between the red wall, the floor, and bunny, the light bounces between the blue wall, the floor, and bunny.
+            between the red wall, the floor, and bunny, the light bounces between the blue wall, the floor, and bunny. The light reflection is most obvious when max_ray_depth = 100. In conclusion, the more recursive calls to at_least_one_bounce_radiance,
+            the more realistic the rendered scene is as the output radiance includes light bouncing from multiple different diretcions, thus the shading on a surface is more vivid with respect to the lighting and colors of the scene.
         </p>
         <br>
 
@@ -499,7 +504,8 @@ You will probably want to use the instructional machines for the above renders i
         </div>
         <br>
         <p>
-            With max_ray_depth of 3, the scene with spheres at different samples per pixels are shown above.
+            With max_ray_depth of 3, the scene with spheres at different samples per pixels are shown above. The higher the sample rate, the lower the noise in the rendered scene. With 1 sample per pixel, the artifacts are very obvious, but with 1024 samples per
+            pixel, the noise is almost unnoticable. Having more samples also helps with anti-aliasing.
         </p>
         <br>
 
