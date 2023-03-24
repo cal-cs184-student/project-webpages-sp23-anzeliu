@@ -54,6 +54,15 @@
 
     <div class="padded">
 
+        <h1 align="middle">Overview</h1>
+
+        <p>In project 3-2, I implemented Part 1: Mirror and Glass Materials and Part 2: Microfacet Material, as additional features to path tracer. I implemented the reflect and refract functions to enable mirror and glass materials to be sampled with their
+            respective sample_f functions. I also implemented the microfacet functions, which compute the BRDF, the Beckmann normal distribution, and Fresnel term, followed by importance sampling the Beckmann normal distribution function. To sample from
+            the NDF, first sample the polar angle and the azimuthal angle for half vector h based on computed pdfs. Once obtaining the half vector based on the sampled angles, reflect the input vector wo across h to get the incident direction wi. Finally,
+            compute the pdf of sampling vector wi with respect to solid angle by first calculating the pdfs of sampling h with respect to its polar and azimuthal angles. I also analyzed the differences in rendered scenes with different maximum number
+            of bounces, roughness of the macro surface, sampling methods, and conductive material in terms of light bounces, noise, and object/shade visibility.
+        </p>
+
         <h3 align="middle">Part 1. Mirror and Glass Materials</h3>
 
         <p><b>
@@ -102,21 +111,32 @@
         </div>
 
         <p>
-            Your response goes here.
+            The above sequence of scenes with different max_ray_depth are rendered with 256 samples per pixel and 4 samples per light. The higher the maximum number of bounces for a ray, the more reflections we can observe in the rendered scene and the glass and
+            mirror material of the spheres becomes more realistic. To enable mirror material to be rendered, implement the BDSF::reflect() to reflect the input wo across the normal, which lies on the z-axis. To enable glass material to be rendered, implement
+            BSDF::refract, which uses Snell's Law to refract wo and store the resulting ray in wi. Specifically, determined by whether vector wo is entering or exiting the material, calculate eta using the index of refraction. Then use eta to calculate
+            the value of the (x, y, z) coordinates of wi. Finally, implement GlassBSDF::sample_f(), which calls either reflect or refract based on the probability of Schlick's reflection coefficient, which approximates the Fresnel coefficient R.
         </p>
         <br>
         <p><b>
             Point out the new multibounce effects that appear in each image. 
         </b></p>
         <p>
-            Your response goes here.
+            The scene with 0 max_ray_depth only has the light source visible to the camera. The scene with 1 max_ray_depth has the walls, ceiling, floor, and the silhouette of the sphere visible. The scene with 2 max_ray_depth has the walls being reflected in the
+            mirror sphere and slightly visible on the glass sphere. The scene with 3 max_ray_depth has refraction in the glass sphere. The scene with 4 max_ray_depth has the glass sphere being reflected on the mirror sphere and a small white light area
+            on the blue wall at the bottom right corner. The scene with 5 max_ray_depth has more pink colors on the right side of the glass sphere. The scene with 100 max_ray_depth has slightly brighter objects overall.
         </p>
         <br>
         <p><b>
             Explain how these bounce numbers relate to the particular effects that appear. Make sure to include all screenshots.
         </b></p>
         <p>
-            Your response goes here.
+            The scene with 0 max_ray_depth only has zero bounce illumination, so only the light source is visible to the camera. The scene with 1 max_ray_depth has zero and one bounce illumination: in addition to the light source being visible, the camera ray bounces
+            off an object point before reaching the light source, resulting in the rectangular light being visible on the two spheres, as well as the walls. The scene with 2 max_ray_depth has a max of 2 bounces before the camera ray reaches the light
+            source. This results in the walls being fully visible on the sphere with mirror material and slightly visible on the sphere with glass material. The scene with 3 max_ray_depth results in more refraction in the glass sphere: the light bounces
+            onto the glass sphere and refracts inside the glass sphere. The scene with 4 max_ray_depth has the glass sphere being visible on the mirror sphere: the ray bounces from the light source to the blue wall, to the glass sphere, through the glass
+            sphere, to the mirror sphere, and finally to the camera. In addition, there is a small white area on the blue wall as a result of multiple ray bounces from the light source. The scene with 5 max_ray_depth enhances the lighting from the scene
+            with 4 max_ray_depth, as seen in the pink color on the right side of the glass sphere due to the light bouncing off from the pink wall. Finally, the scene with 100 max_ray_depth greatly illuminates the scene with rays bouncing off multiple
+            different object points. (The screenshots are shown above.)
         </p>
         <br>
 
@@ -125,9 +145,6 @@
         <p><b>
             Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
         </b></p>
-        <p>
-            Your response goes here.
-        </p>
 
         <div align="middle">
             <table style="width:100%">
@@ -154,13 +171,17 @@
             </table>
         </div>
 
+        <p>
+            The above sequence of scenes are rendered with 256 samples per pixel, 4 samples per light, and 7 maximum bounces. When the roughness of the macro surface is large, the material becomes more diffuse, whereas when the roughness is small, the material becomes
+            more glossy. With a roughness of 0.005, less than half of the surfaces on the dragon appear gold and the image is specular with white dots. With a roughness of 0.05, more surfaces on the dragon appear gold. With a roughness of 0.25, only the
+            side of the dragon appears gray. With a roughness of 0.5, the dragon has more diffused gold color across its entire body and the white dots are almost invisible as specularity has decreased.
+        </p>
+
         <br>
         <p><b>
             Show two images of scene `CBbunny_microfacet_cu.dae` rendered using cosine hemisphere sampling (default) and your importance sampling. The sampling rate should be fixed at 64 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Briefly discuss their difference.
         </b></p>
-        <p>
-            Your response goes here.
-        </p>
+
 
         <div align="middle">
             <table style="width:100%">
@@ -177,28 +198,52 @@
             </table>
         </div>
 
+        <p>
+            The two scenes, one with cosine hemisphere sampling and the other with importance sampling, are rendered with 64 samples per pixel, 1 sample per light, and 7 maximum bounces. The bunny with cosine hemisphere sampling has a dark/black silhouette, which
+            is not visible on the bunny with importance sampling. The reflections of the walls, ceiling, and floor on the bunny are much more noisy in the scene with hemisphere sampling. The reflections on the bunny with importance sampling are much clearer
+            to see. This suggests that importance sampling is more efficient for Beckmann distribution, which determines how the microfacets' normals are distributed.
+        </p>
+
         <br>
         <p><b>
             Show at least one image with some other conductor material, replacing `eta` and `k`. Note that you should look up values for real data rather than modifying them arbitrarily. Tell us what kind of material your parameters correspond to. 
         </b></p>
-        <p>
-            Your response goes here.
-        </p>
 
         <div align="middle">
             <table style="width:100%">
                 <tr align="center">
                     <td>
-                        <img src="images/part2/2_dragon_iron.png" align="middle" width="400px" />
-                        <figcaption>iron material (CBdragon_microfacet_au.dae)</figcaption>
+                        <img src="images/part2/2_dragon_iron_25.png" align="middle" width="400px" />
+                        <figcaption>iron 0.25 roughness (CBdragon_microfacet_au.dae)</figcaption>
                     </td>
-                    <!-- <td>
-                        <img src="images/part2/2_bunny_importance.png" align="middle" width="400px" />
-                        <figcaption>importance sampling (CBbunny_microfacet_cu.dae)</figcaption>
-                    </td> -->
+                    <td>
+                        <img src="images/part2/2_dragon_iron.png" align="middle" width="400px" />
+                        <figcaption>iron 0.5 roughness (CBbunny_microfacet_cu.dae)</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/part2/2_dragon_magnesium_25.png" align="middle" width="400px" />
+                        <figcaption>magnesium 0.25 roughness (CBdragon_microfacet_au.dae)</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/part2/2_dragon_magnesium.png" align="middle" width="400px" />
+                        <figcaption>magnesium 0.5 roughness (CBbunny_microfacet_cu.dae)</figcaption>
+                    </td>
                 </tr>
             </table>
         </div>
+
+        <p>
+            Iron (Fe) eta = 2.8851 2.9500 2.6500, k = 3.0449 2.9300 2.8075
+        </p>
+
+        <p>
+            Magnesium(Mg) eta = 0.37635 0.31405 0.23451, k = 5.6806 5.0262 4.1906</k>
+        </p>
+        <p>
+            The dragons in the first row have iron material and the dragons in the second row have magnesium material. For each conductor material, two images are shown with different roughness.
+        </p>
 
         <br>
 
