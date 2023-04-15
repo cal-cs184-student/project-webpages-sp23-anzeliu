@@ -1,27 +1,81 @@
-<html>
-	<head>
-	</head>
-	<body>
-		<h3>CS184/284A Project Webpages</h3>
-		<br><br>
-		<a href="/proj1/index.html">Project 1</a>
-		<br><br>
-		<a href="/proj2/index.html">Project 2</a>
-		<br><br>
-		<a href="/proj3-1/index.html">Project 3-1</a>
-		<br><br>
-		<a href="/proj3-2/index.html">Project 3-2</a>
-		<br><br>
-		<a href="/proj4/index.html">Project 4</a>
-	</body>
-	<script>
-		var links = document.body.getElementsByTagName("a")
-		var a = window.location.href.indexOf(".io")
-		var repo_name = window.location.href.substring(a+3)
-		for(var i = 0; i < links.length; i++){
-			var link = links[i]
-			var actual_name = link.href.substring(link.href.indexOf(".io")+4)
-			link.href = repo_name + actual_name
-		}
-	</script>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <style>
+        body {
+            background-color: white;
+            padding: 100px;
+            width: 1000px;
+            margin: auto;
+            text-align: left;
+            font-weight: 300;
+            font-family: 'Open Sans', sans-serif;
+            color: #121212;
+        }
+        
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Source Sans Pro', sans-serif;
+            text-align: center;
+        }
+        
+        kbd {
+            color: #121212;
+        }
+    </style>
+    <title>CS 184 Clothsim</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [
+                    ['$', '$'],
+                    ['\\(', '\\)']
+                ]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+
+</head>
+
+<body>
+    <h1>Computer Graphics Projects</h1>
+    <h2>Anze Liu</h2>
+    <br><br>
+    <a href="/proj1/index.html">Project 1: Rasterizer</a>
+    <p>A rasterizer with triangle drawing, antialiasing with supersampling, transforms in homogeneous coordinates, barycentric interpolation, and texture mapping.
+    </p>
+    <br><br>
+    <a href="/proj2/index.html">Project 2: MeshEdit</a>
+    <p>A mesh editor with geometric modeling, triangle edge manipulations via half-edge data structure, and loop subdivision to upsample 3D meshes.
+    </p>
+    <br><br>
+    <a href="/proj3-1/index.html">Project 3-1: Path Tracer</a>
+    <br>
+    <a href="/proj3-2/index.html">Project 3-2: Additional Path Tracer Features</a>
+    <p>A path tracer with camera ray generation, ray-scene intersection, Bounding Volume Hierarchy acceleration structure, physically based direct and indirect lighting, and adaptive sampling.
+    </p>
+    <br><br>
+    <a href="/proj4/index.html">Project 4: Cloth Simulation</a>
+    <p>A cloth simulator with a grid of masses and springs, numerical integration to update vertex positions under the influence of gravitational and spring force, cloth-object collisions, and various shaders in GLSL, e.g. displacement mapping.
+    </p>
+</body>
+<script>
+    var links = document.body.getElementsByTagName("a")
+    var a = window.location.href.indexOf(".io")
+    var repo_name = window.location.href.substring(a + 3)
+    for (var i = 0; i < links.length; i++) {
+        var link = links[i]
+        var actual_name = link.href.substring(link.href.indexOf(".io") + 4)
+        link.href = repo_name + actual_name
+    }
+</script>
+
 </html>
